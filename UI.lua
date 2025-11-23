@@ -160,7 +160,14 @@ local function executeAutoFish()
     end
     
     local success, err = pcall(function()
+        -- Bước 0: Equip Tool From Hotbar
+        local args = {
+            1
+        }
+        game:GetService("ReplicatedStorage"):WaitForChild("Packages"):WaitForChild("_Index"):WaitForChild("sleitnick_net@0.2.0"):WaitForChild("net"):WaitForChild("RE/EquipToolFromHotbar"):FireServer(unpack(args))
+        
         -- Bước 1: Charge Fishing Rod
+        wait(0.5)
         game:GetService("ReplicatedStorage"):WaitForChild("Packages"):WaitForChild("_Index"):WaitForChild("sleitnick_net@0.2.0"):WaitForChild("net"):WaitForChild("RF/ChargeFishingRod"):InvokeServer()
         
         -- Bước 2: Đợi 1 giây rồi Request Fishing Minigame
