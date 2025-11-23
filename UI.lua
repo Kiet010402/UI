@@ -279,6 +279,10 @@ spawn(function()
     end
 end)
 
+-- Thêm hỗ trợ Logo khi minimize
+repeat task.wait(0.25) until game:IsLoaded()
+getgenv().Image = "rbxassetid://13099788281" -- ID tài nguyên hình ảnh logo
+getgenv().ToggleUI = "LeftControl" -- Phím để bật/tắt giao diện
 -- Tạo logo để mở lại UI khi đã minimize
 task.spawn(function()
     local success, errorMsg = pcall(function()
