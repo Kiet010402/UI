@@ -1,10 +1,8 @@
 -- Load UI Library với error handling
 local success, err = pcall(function()
     Fluent = loadstring(game:HttpGet("https://github.com/dawid-scripts/Fluent/releases/latest/download/main.lua"))()
-    SaveManager = loadstring(game:HttpGet(
-    "https://raw.githubusercontent.com/dawid-scripts/Fluent/master/Addons/SaveManager.lua"))()
-    InterfaceManager = loadstring(game:HttpGet(
-    "https://raw.githubusercontent.com/dawid-scripts/Fluent/master/Addons/InterfaceManager.lua"))()
+    SaveManager = loadstring(game:HttpGet("https://raw.githubusercontent.com/dawid-scripts/Fluent/master/Addons/SaveManager.lua"))()
+    InterfaceManager = loadstring(game:HttpGet("https://raw.githubusercontent.com/dawid-scripts/Fluent/master/Addons/InterfaceManager.lua"))()
 end)
 
 if not success then
@@ -12,10 +10,8 @@ if not success then
     -- Thử tải từ URL dự phòng
     pcall(function()
         Fluent = loadstring(game:HttpGet("https://raw.githubusercontent.com/dawid-scripts/Fluent/master/Fluent.lua"))()
-        SaveManager = loadstring(game:HttpGet(
-        "https://raw.githubusercontent.com/dawid-scripts/Fluent/master/Addons/SaveManager.lua"))()
-        InterfaceManager = loadstring(game:HttpGet(
-        "https://raw.githubusercontent.com/dawid-scripts/Fluent/master/Addons/InterfaceManager.lua"))()
+        SaveManager = loadstring(game:HttpGet("https://raw.githubusercontent.com/dawid-scripts/Fluent/master/Addons/SaveManager.lua"))()
+        InterfaceManager = loadstring(game:HttpGet("https://raw.githubusercontent.com/dawid-scripts/Fluent/master/Addons/InterfaceManager.lua"))()
     end)
 end
 
@@ -54,7 +50,7 @@ ConfigSystem.LoadConfig = function()
         end
         return nil
     end)
-
+    
     if success and content then
         local data = game:GetService("HttpService"):JSONDecode(content)
         ConfigSystem.CurrentConfig = data
@@ -105,10 +101,10 @@ AutoFarmSection:AddButton({
         if character and character:FindFirstChild("HumanoidRootPart") then
             local hrp = character.HumanoidRootPart
             local pos = hrp.Position
-            savedPosition = { pos.X, pos.Y, pos.Z }
+            savedPosition = {pos.X, pos.Y, pos.Z}
             ConfigSystem.CurrentConfig.SavedPosition = savedPosition
             ConfigSystem.SaveConfig()
-
+            
             Fluent:Notify({
                 Title = "Save Pos",
                 Content = string.format("Đã lưu tọa độ: X=%.2f, Y=%.2f, Z=%.2f", pos.X, pos.Y, pos.Z),
@@ -129,17 +125,17 @@ local function moveToSavedPosition()
     if not savedPosition then
         return false
     end
-
+    
     local player = game:GetService("Players").LocalPlayer
     local character = player.Character
     if not character or not character:FindFirstChild("HumanoidRootPart") then
         return false
     end
-
+    
     local hrp = character.HumanoidRootPart
     local currentPos = hrp.Position
     local targetPos = Vector3.new(savedPosition[1], savedPosition[2], savedPosition[3])
-
+    
     -- Kiểm tra khoảng cách (nếu cách xa hơn 5 studs thì di chuyển)
     local distance = (currentPos - targetPos).Magnitude
     if distance > 5 then
@@ -147,7 +143,7 @@ local function moveToSavedPosition()
         wait(0.5) -- Đợi một chút để đảm bảo di chuyển xong
         return true
     end
-
+    
     return true
 end
 
@@ -156,26 +152,24 @@ local function executeAutoFish()
     if not autoFishEnabled then
         return
     end
-
+    
     -- Kiểm tra và di chuyển đến tọa độ đã lưu nếu cần
     if savedPosition then
         moveToSavedPosition()
         wait(0.5)
     end
-
+    
     local success, err = pcall(function()
         -- Bước 0: Equip Tool From Hotbar
         local args = {
             1
         }
-        game:GetService("ReplicatedStorage"):WaitForChild("Packages"):WaitForChild("_Index"):WaitForChild(
-        "sleitnick_net@0.2.0"):WaitForChild("net"):WaitForChild("RE/EquipToolFromHotbar"):FireServer(unpack(args))
-
+        game:GetService("ReplicatedStorage"):WaitForChild("Packages"):WaitForChild("_Index"):WaitForChild("sleitnick_net@0.2.0"):WaitForChild("net"):WaitForChild("RE/EquipToolFromHotbar"):FireServer(unpack(args))
+        
         -- Bước 1: Charge Fishing Rod
         wait(0.5)
-        game:GetService("ReplicatedStorage"):WaitForChild("Packages"):WaitForChild("_Index"):WaitForChild(
-        "sleitnick_net@0.2.0"):WaitForChild("net"):WaitForChild("RF/ChargeFishingRod"):InvokeServer()
-
+        game:GetService("ReplicatedStorage"):WaitForChild("Packages"):WaitForChild("_Index"):WaitForChild("sleitnick_net@0.2.0"):WaitForChild("net"):WaitForChild("RF/ChargeFishingRod"):InvokeServer()
+        
         -- Bước 2: Đợi 1 giây rồi Request Fishing Minigame
         wait(1)
         local args = {
@@ -183,21 +177,18 @@ local function executeAutoFish()
             0.9940152067553181,
             1763908713.407927
         }
-        game:GetService("ReplicatedStorage"):WaitForChild("Packages"):WaitForChild("_Index"):WaitForChild(
-        "sleitnick_net@0.2.0"):WaitForChild("net"):WaitForChild("RF/RequestFishingMinigameStarted"):InvokeServer(unpack(
-        args))
-
+        game:GetService("ReplicatedStorage"):WaitForChild("Packages"):WaitForChild("_Index"):WaitForChild("sleitnick_net@0.2.0"):WaitForChild("net"):WaitForChild("RF/RequestFishingMinigameStarted"):InvokeServer(unpack(args))
+        
         -- Bước 3: Đợi 4 giây rồi Fire Fishing Completed
         wait(4)
-        game:GetService("ReplicatedStorage"):WaitForChild("Packages"):WaitForChild("_Index"):WaitForChild(
-        "sleitnick_net@0.2.0"):WaitForChild("net"):WaitForChild("RE/FishingCompleted"):FireServer()
+        game:GetService("ReplicatedStorage"):WaitForChild("Packages"):WaitForChild("_Index"):WaitForChild("sleitnick_net@0.2.0"):WaitForChild("net"):WaitForChild("RE/FishingCompleted"):FireServer()
     end)
-
+    
     if not success then
         warn("Lỗi Auto Fish: " .. tostring(err))
-    end
-end
-
+                end
+            end
+            
 -- Toggle Auto Fish
 AutoFarmSection:AddToggle("AutoFishToggle", {
     Title = "Auto Fish",
@@ -207,7 +198,7 @@ AutoFarmSection:AddToggle("AutoFishToggle", {
         autoFishEnabled = Value
         ConfigSystem.CurrentConfig.AutoFishEnabled = Value
         ConfigSystem.SaveConfig()
-
+        
         if Value then
             if not savedPosition then
                 Fluent:Notify({
@@ -257,7 +248,7 @@ local ThemeSection = SettingsTab:AddSection("Giao diện")
 ThemeSection:AddDropdown("ThemeSelector", {
     Title = "Chọn Theme",
     Description = "Thay đổi giao diện",
-    Values = { "Dark", "Light", "Darker", "Rose", "Amethyst" },
+    Values = {"Dark", "Light", "Darker", "Rose", "Amethyst"},
     Default = "Dark",
     Multi = false,
     Callback = function(Value)
@@ -277,10 +268,10 @@ local function AutoSaveConfig()
             pcall(function()
                 ConfigSystem.SaveConfig()
             end)
-        end
-    end)
-end
-
+                            end
+                        end)
+                    end
+                    
 -- Thực thi tự động lưu cấu hình
 AutoSaveConfig()
 
@@ -288,22 +279,22 @@ AutoSaveConfig()
 spawn(function()
     while true do
         wait(3) -- Đợi 3 giây giữa mỗi lần thực hiện
-
+        
         if autoFishEnabled then
             executeAutoFish()
         end
-    end
-end)
-
+                end
+            end)
+            
 -- Tạo logo để mở lại UI khi đã minimize
 task.spawn(function()
     local success, errorMsg = pcall(function()
-        if not getgenv().LoadedMobileUI == true then
+        if not getgenv().LoadedMobileUI == true then 
             getgenv().LoadedMobileUI = true
             local OpenUI = Instance.new("ScreenGui")
             local ImageButton = Instance.new("ImageButton")
             local UICorner = Instance.new("UICorner")
-
+            
             -- Kiểm tra môi trường
             if syn and syn.protect_gui then
                 syn.protect_gui(OpenUI)
@@ -313,39 +304,38 @@ task.spawn(function()
             else
                 OpenUI.Parent = game:GetService("CoreGui")
             end
-
+            
             OpenUI.Name = "OpenUI"
             OpenUI.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
-
+            
             ImageButton.Parent = OpenUI
-            ImageButton.BackgroundColor3 = Color3.fromRGB(105, 105, 105)
+            ImageButton.BackgroundColor3 = Color3.fromRGB(105,105,105)
             ImageButton.BackgroundTransparency = 0.8
-            ImageButton.Position = UDim2.new(0.9, 0, 0.1, 0)
-            ImageButton.Size = UDim2.new(0, 50, 0, 50)
+            ImageButton.Position = UDim2.new(0.9,0,0.1,0)
+            ImageButton.Size = UDim2.new(0,50,0,50)
             ImageButton.Image = "rbxassetid://13099788281" -- Có thể thay đổi logo
             ImageButton.Draggable = true
             ImageButton.Transparency = 0.2
-
-            UICorner.CornerRadius = UDim.new(0, 200)
+            
+            UICorner.CornerRadius = UDim.new(0,200)
             UICorner.Parent = ImageButton
-
-            -- Khi click vào logo sẽ mở lại UI
+            
+            -- Khi click vào logo sẽ toggle UI
             ImageButton.MouseButton1Click:Connect(function()
-                if Window and Window.Minimize then
-                    -- Nếu window đang minimized thì maximize lại
-                    if Window.Minimized then
-                        Window:Maximize()
-                    else
-                        -- Nếu không minimized thì minimize rồi maximize để đảm bảo hiện
-                        Window:Minimize()
-                        task.wait(0.1)
-                        Window:Maximize()
-                    end
-                end
+                pcall(function()
+                    -- Gửi key event đúng cách (key down và key up) để toggle UI
+                    local VirtualInputManager = game:GetService("VirtualInputManager")
+                    -- Key down
+                    VirtualInputManager:SendKeyEvent(true, Enum.KeyCode.LeftControl, false, game)
+                    -- Đợi một chút
+                    task.wait(0.05)
+                    -- Key up
+                    VirtualInputManager:SendKeyEvent(false, Enum.KeyCode.LeftControl, false, game)
+                end)
             end)
         end
     end)
-
+    
     if not success then
         warn("Lỗi khi tạo nút Logo UI: " .. tostring(errorMsg))
     end
@@ -353,3 +343,4 @@ end)
 
 print("Script Hub đã tải thành công!")
 print("Sử dụng Left Ctrl để thu nhỏ/mở rộng UI")
+
