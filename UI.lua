@@ -25,10 +25,6 @@ end
 local ConfigSystem = {}
 ConfigSystem.FileName = "ScriptConfig_" .. game:GetService("Players").LocalPlayer.Name .. ".json"
 ConfigSystem.DefaultConfig = {
-    -- Thêm các cấu hình mặc định của bạn ở đây
-    ExampleToggle = false,
-    ExampleDropdown = "Option1",
-    ExampleSlider = 50,
     SavedPosition = nil, -- Lưu tọa độ {X, Y, Z}
     AutoFishEnabled = false
 }
@@ -63,8 +59,8 @@ ConfigSystem.LoadConfig = function()
         ConfigSystem.CurrentConfig = table.clone(ConfigSystem.DefaultConfig)
         ConfigSystem.SaveConfig()
         return false
-            end
-        end
+    end
+end
 
 -- Tải cấu hình khi khởi động
 ConfigSystem.LoadConfig()
@@ -92,63 +88,8 @@ local MainTab = Window:AddTab({ Title = "Main", Icon = "rbxassetid://13311802307
 local SettingsTab = Window:AddTab({ Title = "Settings", Icon = "rbxassetid://13311798537" })
 
 -- ========== TAB MAIN ==========
--- Section 1: Auto Farm
+-- Section: Auto Farm
 local AutoFarmSection = MainTab:AddSection("Auto Farm")
-
--- Toggle Example
-AutoFarmSection:AddToggle("AutoFarmToggle", {
-    Title = "Auto Farm",
-    Description = "Tự động farm",
-    Default = ConfigSystem.CurrentConfig.ExampleToggle or false,
-    Callback = function(Value)
-        ConfigSystem.CurrentConfig.ExampleToggle = Value
-        ConfigSystem.SaveConfig()
-        
-        if Value then
-            Fluent:Notify({
-                Title = "Auto Farm",
-                Content = "Đã bật Auto Farm",
-                Duration = 3
-            })
-            -- Thêm logic của bạn ở đây
-        else
-            Fluent:Notify({
-                Title = "Auto Farm",
-                Content = "Đã tắt Auto Farm",
-                Duration = 3
-            })
-        end
-    end
-})
-
--- Dropdown Example
-AutoFarmSection:AddDropdown("FarmLocation", {
-    Title = "Chọn vị trí",
-    Description = "Chọn nơi muốn farm",
-    Values = {"Location 1", "Location 2", "Location 3"},
-    Default = ConfigSystem.CurrentConfig.ExampleDropdown or "Location 1",
-    Multi = false,
-    Callback = function(Value)
-        ConfigSystem.CurrentConfig.ExampleDropdown = Value
-        ConfigSystem.SaveConfig()
-        print("Đã chọn:", Value)
-    end
-})
-
--- Slider Example
-AutoFarmSection:AddSlider("FarmSpeed", {
-    Title = "Tốc độ Farm",
-    Description = "Điều chỉnh tốc độ farm",
-    Default = ConfigSystem.CurrentConfig.ExampleSlider or 50,
-    Min = 0,
-    Max = 100,
-    Rounding = 0,
-    Callback = function(Value)
-        ConfigSystem.CurrentConfig.ExampleSlider = Value
-        ConfigSystem.SaveConfig()
-        print("Tốc độ:", Value)
-    end
-})
 
 -- Button Save Pos
 AutoFarmSection:AddButton({
@@ -231,8 +172,8 @@ local function executeAutoFish()
         }
         game:GetService("ReplicatedStorage"):WaitForChild("Packages"):WaitForChild("_Index"):WaitForChild("sleitnick_net@0.2.0"):WaitForChild("net"):WaitForChild("RF/RequestFishingMinigameStarted"):InvokeServer(unpack(args))
         
-        -- Bước 3: Đợi 1.5 giây rồi Fire Fishing Completed
-        wait(1.5)
+        -- Bước 3: Đợi 4 giây rồi Fire Fishing Completed
+        wait(4)
         game:GetService("ReplicatedStorage"):WaitForChild("Packages"):WaitForChild("_Index"):WaitForChild("sleitnick_net@0.2.0"):WaitForChild("net"):WaitForChild("RE/FishingCompleted"):FireServer()
     end)
     
@@ -272,42 +213,6 @@ AutoFarmSection:AddToggle("AutoFishToggle", {
                 Duration = 3
             })
         end
-    end
-})
-
--- Button Example
-AutoFarmSection:AddButton({
-    Title = "Start Farm",
-    Description = "Bắt đầu farm ngay",
-    Callback = function()
-        Fluent:Notify({
-            Title = "Thông báo",
-            Content = "Đã bắt đầu farm!",
-            Duration = 3
-        })
-        -- Thêm logic của bạn ở đây
-    end
-})
-
--- Section 2: Teleport
-local TeleportSection = MainTab:AddSection("Teleport")
-
-TeleportSection:AddButton({
-    Title = "Teleport to Spawn",
-    Description = "Dịch chuyển về spawn",
-    Callback = function()
-        local player = game:GetService("Players").LocalPlayer
-        local character = player.Character or player.CharacterAdded:Wait()
-        local humanoidRootPart = character:WaitForChild("HumanoidRootPart")
-        
-        -- Thay đổi vị trí spawn tùy theo game
-        humanoidRootPart.CFrame = CFrame.new(0, 10, 0)
-        
-        Fluent:Notify({
-            Title = "Teleport",
-            Content = "Đã dịch chuyển về spawn!",
-            Duration = 3
-        })
     end
 })
 
@@ -356,8 +261,8 @@ local function AutoSaveConfig()
             pcall(function()
                 ConfigSystem.SaveConfig()
             end)
-                end
-            end)
+        end
+    end)
 end
 
 -- Thực thi tự động lưu cấu hình
