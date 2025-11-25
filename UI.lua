@@ -266,7 +266,7 @@ EventSection:AddToggle("HalloweenEventToggle", {
     end
 })
 
--- Hàm focus Retry button bằng Selection Highlight
+-- Hàm focus Retry button bằng Selection Highlight (cải thiện)
 local function findAndClickRetry()
     local Players = game:GetService("Players")
     local GuiService = game:GetService("GuiService")
@@ -274,135 +274,172 @@ local function findAndClickRetry()
 
     local success, result = pcall(function()
         local player = Players.LocalPlayer
-        local retryButton = player.PlayerGui:WaitForChild("EndGameUI"):WaitForChild("BG"):WaitForChild("Buttons")
-            :WaitForChild("Retry")
+        local endGameUI = player.PlayerGui:WaitForChild("EndGameUI", 5)
 
-        if retryButton and retryButton:IsA("GuiButton") then
-            -- Đảm bảo SelectionImageObject tồn tại với cấu hình đúng
-            local selectionImage = retryButton:FindFirstChild("SelectionImageObject")
-            if not selectionImage then
-                selectionImage = Instance.new("ImageLabel")
-                selectionImage.Name = "SelectionImageObject"
-                selectionImage.Size = UDim2.new(1, 0, 1, 0)
-                selectionImage.BackgroundTransparency = 1
-                selectionImage.BorderSizePixel = 0
-                selectionImage.ZIndex = retryButton.ZIndex + 1
-                selectionImage.Parent = retryButton
-            end
-            
-            -- Cấu hình SelectionImageObject để hiển thị highlight đẹp (giống ảnh)
-            selectionImage.Image = "rbxasset://textures/ui/SelectionBox.png"
-            selectionImage.ImageColor3 = Color3.fromRGB(0, 162, 255) -- Màu xanh sáng như trong ảnh
-            selectionImage.ImageTransparency = 0.3 -- Giảm transparency để highlight rõ hơn
-            selectionImage.AnchorPoint = Vector2.new(0.5, 0.5)
-            selectionImage.Position = UDim2.new(0.5, 0, 0.5, 0)
-
-            -- Sử dụng task.spawn để không block UI
-            task.spawn(function()
-                -- Set selection để highlight nút (như trong ảnh)
-                GuiService:SetSelectedObject(retryButton)
-                task.wait(0.15) -- Đợi một chút để highlight hiển thị rõ
-                
-                -- Gửi phím Enter để kích hoạt nút đã được selected (không dùng mouse click)
-                VirtualInputManager:SendKeyEvent(true, Enum.KeyCode.Return, false, game)
-                task.wait(0.05)
-                VirtualInputManager:SendKeyEvent(false, Enum.KeyCode.Return, false, game)
-            end)
-
-            print("Đã focus vào nút Retry bằng Selection Highlight và kích hoạt bằng Enter")
-            return true
-        else
-            warn("Không tìm thấy nút Retry!")
+        if not endGameUI then
+            warn("EndGameUI not found!")
             return false
         end
+
+        local retryButton = endGameUI:WaitForChild("BG", 2):WaitForChild("Buttons", 2):WaitForChild("Retry", 2)
+
+        if not retryButton or not retryButton:IsA("GuiButton") then
+            warn("Retry button not found or not a GuiButton!")
+            return false
+        end
+
+        -- Tạo Selection Image nếu chưa có
+        if not retryButton:FindFirstChild("SelectionImageObject") then
+            local selectionImage = Instance.new("ImageLabel")
+            selectionImage.Name = "SelectionImageObject"
+            selectionImage.Size = UDim2.new(1, 0, 1, 0)
+            selectionImage.BackgroundTransparency = 1
+            selectionImage.BorderSizePixel = 0
+            selectionImage.Image = "rbxasset://textures/ui/SelectionBox.png"
+            selectionImage.ImageColor3 = Color3.fromRGB(0, 162, 255)
+            selectionImage.ImageTransparency = 0.5
+            selectionImage.Parent = retryButton
+        end
+
+        -- Spawn riêng để không block UI
+        task.spawn(function()
+            task.wait(0.1) -- Đợi button render hoàn chỉnh
+
+            -- Set button được selected
+            GuiService:SetSelectedObject(retryButton)
+            task.wait(0.2)
+
+            -- Gửi phím Enter để kích hoạt
+            VirtualInputManager:SendKeyEvent(true, Enum.KeyCode.Return, false, game)
+            task.wait(0.1)
+            VirtualInputManager:SendKeyEvent(false, Enum.KeyCode.Return, false, game)
+
+            print("✓ Retry button clicked via Selection Highlight")
+        end)
+
+        return true
     end)
 
     if not success then
-        warn("Lỗi khi focus Retry:", result)
+        warn("❌ Lỗi khi focus Retry:", result)
         return false
     end
 
     return result
 end
 
--- Hàm click Next button
+-- Hàm click Next button bằng Selection Highlight (cải thiện tương tự)
 local function findAndClickNext()
     local Players = game:GetService("Players")
+    local GuiService = game:GetService("GuiService")
     local VirtualInputManager = game:GetService("VirtualInputManager")
 
     local success, result = pcall(function()
         local player = Players.LocalPlayer
-        local nextButton = player.PlayerGui:WaitForChild("EndGameUI"):WaitForChild("BG"):WaitForChild("Buttons")
-            :WaitForChild("Next")
+        local endGameUI = player.PlayerGui:WaitForChild("EndGameUI", 5)
 
-        if nextButton and nextButton:IsA("GuiButton") then
-            local absolutePosition = nextButton.AbsolutePosition
-            local absoluteSize = nextButton.AbsoluteSize
-
-            local centerX = absolutePosition.X + (absoluteSize.X / 2)
-            local centerY = absolutePosition.Y + (absoluteSize.Y / 2) + 55
-
-            -- Sử dụng task.spawn để không block UI
-            task.spawn(function()
-                VirtualInputManager:SendMouseMoveEvent(centerX, centerY, game)
-                task.wait(0.1)
-                VirtualInputManager:SendMouseButtonEvent(centerX, centerY, 0, true, game, 0)
-                task.wait(0.05)
-                VirtualInputManager:SendMouseButtonEvent(centerX, centerY, 0, false, game, 0)
-            end)
-
-            print("Đã click vào nút Next tại vị trí:", centerX, centerY)
-            return true
-        else
-            warn("Không tìm thấy nút Next!")
+        if not endGameUI then
+            warn("EndGameUI not found!")
             return false
         end
+
+        local nextButton = endGameUI:WaitForChild("BG", 2):WaitForChild("Buttons", 2):WaitForChild("Next", 2)
+
+        if not nextButton or not nextButton:IsA("GuiButton") then
+            warn("Next button not found or not a GuiButton!")
+            return false
+        end
+
+        -- Tạo Selection Image nếu chưa có
+        if not nextButton:FindFirstChild("SelectionImageObject") then
+            local selectionImage = Instance.new("ImageLabel")
+            selectionImage.Name = "SelectionImageObject"
+            selectionImage.Size = UDim2.new(1, 0, 1, 0)
+            selectionImage.BackgroundTransparency = 1
+            selectionImage.BorderSizePixel = 0
+            selectionImage.Image = "rbxasset://textures/ui/SelectionBox.png"
+            selectionImage.ImageColor3 = Color3.fromRGB(0, 162, 255)
+            selectionImage.ImageTransparency = 0.5
+            selectionImage.Parent = nextButton
+        end
+
+        task.spawn(function()
+            task.wait(0.1)
+
+            GuiService:SetSelectedObject(nextButton)
+            task.wait(0.2)
+
+            VirtualInputManager:SendKeyEvent(true, Enum.KeyCode.Return, false, game)
+            task.wait(0.1)
+            VirtualInputManager:SendKeyEvent(false, Enum.KeyCode.Return, false, game)
+
+            print("✓ Next button clicked via Selection Highlight")
+        end)
+
+        return true
     end)
 
     if not success then
-        warn("Lỗi khi click Next:", result)
+        warn("❌ Lỗi khi click Next:", result)
         return false
     end
 
     return result
 end
 
--- Hàm click Leave button
+-- Hàm click Leave button bằng Selection Highlight (cải thiện tương tự)
 local function findAndClickLeave()
     local Players = game:GetService("Players")
+    local GuiService = game:GetService("GuiService")
     local VirtualInputManager = game:GetService("VirtualInputManager")
 
     local success, result = pcall(function()
         local player = Players.LocalPlayer
-        local leaveButton = player.PlayerGui:WaitForChild("EndGameUI"):WaitForChild("BG"):WaitForChild("Buttons")
-            :WaitForChild("Leave")
+        local endGameUI = player.PlayerGui:WaitForChild("EndGameUI", 5)
 
-        if leaveButton and leaveButton:IsA("GuiButton") then
-            local absolutePosition = leaveButton.AbsolutePosition
-            local absoluteSize = leaveButton.AbsoluteSize
-
-            local centerX = absolutePosition.X + (absoluteSize.X / 2)
-            local centerY = absolutePosition.Y + (absoluteSize.Y / 2) + 55
-
-            -- Sử dụng task.spawn để không block UI
-            task.spawn(function()
-                VirtualInputManager:SendMouseMoveEvent(centerX, centerY, game)
-                task.wait(0.1)
-                VirtualInputManager:SendMouseButtonEvent(centerX, centerY, 0, true, game, 0)
-                task.wait(0.05)
-                VirtualInputManager:SendMouseButtonEvent(centerX, centerY, 0, false, game, 0)
-            end)
-
-            print("Đã click vào nút Leave tại vị trí:", centerX, centerY)
-            return true
-        else
-            warn("Không tìm thấy nút Leave!")
+        if not endGameUI then
+            warn("EndGameUI not found!")
             return false
         end
+
+        local leaveButton = endGameUI:WaitForChild("BG", 2):WaitForChild("Buttons", 2):WaitForChild("Leave", 2)
+
+        if not leaveButton or not leaveButton:IsA("GuiButton") then
+            warn("Leave button not found or not a GuiButton!")
+            return false
+        end
+
+        -- Tạo Selection Image nếu chưa có
+        if not leaveButton:FindFirstChild("SelectionImageObject") then
+            local selectionImage = Instance.new("ImageLabel")
+            selectionImage.Name = "SelectionImageObject"
+            selectionImage.Size = UDim2.new(1, 0, 1, 0)
+            selectionImage.BackgroundTransparency = 1
+            selectionImage.BorderSizePixel = 0
+            selectionImage.Image = "rbxasset://textures/ui/SelectionBox.png"
+            selectionImage.ImageColor3 = Color3.fromRGB(0, 162, 255)
+            selectionImage.ImageTransparency = 0.5
+            selectionImage.Parent = leaveButton
+        end
+
+        task.spawn(function()
+            task.wait(0.1)
+
+            GuiService:SetSelectedObject(leaveButton)
+            task.wait(0.2)
+
+            VirtualInputManager:SendKeyEvent(true, Enum.KeyCode.Return, false, game)
+            task.wait(0.1)
+            VirtualInputManager:SendKeyEvent(false, Enum.KeyCode.Return, false, game)
+
+            print("✓ Leave button clicked via Selection Highlight")
+        end)
+
+        return true
     end)
 
     if not success then
-        warn("Lỗi khi click Leave:", result)
+        warn("❌ Lỗi khi click Leave:", result)
         return false
     end
 
